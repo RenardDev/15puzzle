@@ -23,6 +23,20 @@ int _tmain() {
 
 		SetWindowText(Window.GetWindow(), _T("15puzzle")); // SetConsoleTitle also works
 
+		POINT CurrentPosition = { 0, 0 };
+		if (ScreenToClient(Window.GetWindow(), &CurrentPosition)) {
+			if (SetWindowPos(Window.GetWindow(), NULL, CurrentPosition.x, CurrentPosition.y, 325, 365, SWP_NOSENDCHANGING | SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOMOVE)) {
+				SetWindowLong(Window.GetWindow(), GWL_STYLE, GetWindowLong(Window.GetWindow(), GWL_STYLE) & ~WS_SIZEBOX);
+			}
+		}
+
+		ShowScrollBar(Window.GetWindow(), SB_BOTH, FALSE);
+
+		WINDOW_NATIVE_IO NativeIOs;
+		if (Window.GetNativeIO(&NativeIOs)) {
+			SetConsoleScreenBufferSize(NativeIOs.m_hOUT, { 1, 1 });
+		}
+
 		Terminal::Screen Screen(&Window);
 
 		CONSOLE_SCREEN_BUFFER_INFOEX csbi;
@@ -59,21 +73,21 @@ int _tmain() {
 			if (Screen.GetBufferInfo(&csbi)) {
 				const SHORT unWidth = csbi.srWindow.Right - csbi.srWindow.Left;
 				const SHORT unHeight = csbi.srWindow.Bottom - csbi.srWindow.Top;
-				Screen.SetCursorPosition({ static_cast<SHORT>(csbi.srWindow.Left + (unWidth / 2) - 8), static_cast<SHORT>(csbi.srWindow.Top + (unHeight / 2)) });
+				Screen.SetCursorPosition({ static_cast<SHORT>(csbi.srWindow.Left + (unWidth / 2) - 4), static_cast<SHORT>(csbi.srWindow.Top + (unHeight / 2)) });
 			}
 
 			Console.tprintf(COLOR::COLOR_WHITE, _T("YOU WIN!"));
-
-			return 0;
 		} else { // Doesn't make sense because the game continues indefinitely until the player wins.
 			if (Screen.GetBufferInfo(&csbi)) {
 				const SHORT unWidth = csbi.srWindow.Right - csbi.srWindow.Left;
 				const SHORT unHeight = csbi.srWindow.Bottom - csbi.srWindow.Top;
-				Screen.SetCursorPosition({ static_cast<SHORT>(csbi.srWindow.Left + (unWidth / 2) - 9), static_cast<SHORT>(csbi.srWindow.Top + (unHeight / 2)) });
+				Screen.SetCursorPosition({ static_cast<SHORT>(csbi.srWindow.Left + (unWidth / 2) - 4), static_cast<SHORT>(csbi.srWindow.Top + (unHeight / 2)) });
 			}
 
 			Console.tprintf(COLOR::COLOR_WHITE, _T("YOU LOSE!"));
 		}
+
+		Sleep(5000);
 	}
 
 	return 0;

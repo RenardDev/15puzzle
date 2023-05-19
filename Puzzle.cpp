@@ -57,17 +57,19 @@ bool Puzzle::Run(Terminal::Screen* const pScreen, bool* pIsSolved) {
 	pScreen->GetCursorPosition(&CurrentPosition);
 	pScreen->HideCursor();
 
-	bool bIsSolved = true;
+	bool bIsSolved = false;
 	SHORT LastButtonStates[4] = { 0, 0, 0, 0 };
-	while (m_bStart) {
-		unsigned char unCount = 1;
-		for (unsigned char unY = 0; unY < 4; ++unY) {
-			for (unsigned char unX = 0; unX < 4; ++unX) {
-				if (m_Area[unY][unX] != unCount % 16) {
+	while (!bIsSolved && m_bStart) {
+		bIsSolved = true;
+		unsigned char unSequence = 1;
+		for (unsigned char unY = 0; bIsSolved && (unY < 4); ++unY) {
+			for (unsigned char unX = 0; bIsSolved && (unX < 4); ++unX) {
+				const unsigned int unValue = m_Area[unY][unX];
+				if (unValue != unSequence % 16) {
 					bIsSolved = false;
-					break;
 				}
-				++unCount;
+
+				++unSequence;
 			}
 		}
 
@@ -75,6 +77,7 @@ bool Puzzle::Run(Terminal::Screen* const pScreen, bool* pIsSolved) {
 			if (pIsSolved) {
 				*pIsSolved = bIsSolved;
 			}
+
 			m_bStart = false;
 			break;
 		}
